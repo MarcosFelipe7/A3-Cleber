@@ -1,0 +1,140 @@
+import heapq
+
+class FilaAtendimentoComHeap:
+    def __init__(self):
+        self.fila = []
+        self.contador_senhas = 1
+        self.ordem_chegada = 0
+
+    def pegar_senha(self, nome, idade):
+        senha = f"S{self.contador_senhas:03d}"
+        self.contador_senhas += 1
+
+        prioridade = 0 if idade >= 60 else 1
+        heapq.heappush(self.fila, (prioridade, self.ordem_chegada, senha, nome, idade))
+        self.ordem_chegada += 1
+
+        if prioridade == 0:
+            print("\n")
+            print(f"{nome}, sua senha prioritária é: {senha}")
+        else:
+            print("\n")
+            print(f"{nome}, sua senha é: {senha}")
+
+    def consultar_proxima(self):
+        if self.fila:
+            prioridade, ordem, senha, nome, idade = self.fila[0]
+            if prioridade == 0:
+                print("\n")
+                print(f"Próxima senha (prioritária): {senha} - {nome} ({idade} anos)")
+            else:
+                print("\n")
+                print(f"Próxima senha: {senha} - {nome} ({idade} anos)")
+        else:
+            print("\n")
+            print("Nenhuma senha na fila.")
+
+    def chamar_proxima(self):
+        if self.fila:
+            prioridade, ordem, senha, nome, idade = heapq.heappop(self.fila)
+            if prioridade == 0:
+                print("\n")
+                print(f"Chamando senha prioritária: {senha} - {nome} ({idade} anos)")
+            else:
+                print("\n")
+                print(f"Chamando senha: {senha} - {nome} ({idade} anos)")
+        else:
+            print("\n")
+            print("Nenhuma senha na fila.")
+
+    def listar_fila(self):
+        if self.fila:
+            print("\n")
+            print("Senhas na fila:")
+            for item in sorted(self.fila):
+                prioridade, ordem, senha, nome, idade = item
+                tipo = "Prioritária" if prioridade == 0 else "Normal"
+                print(f"{senha} - {nome} ({idade} anos) [{tipo}]")
+        else:
+            print("\n")
+            print("Nenhuma senha na fila.")
+
+def menu_paciente(fila):
+    while True:
+        print("\n--- Menu Paciente ---")
+        print("1 - Pegar senha")
+        print("2 - Consultar próxima senha")
+        print("0 - Voltar")
+
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == "1":
+            nome = input("Digite seu nome: ")
+            try:
+                idade = int(input("Digite sua idade: "))
+                fila.pegar_senha(nome, idade)
+                break  # <- Após pegar senha, volta pro menu principal
+            except ValueError:
+                print("\n")
+                print("Idade inválida.")
+        elif opcao == "2":
+            fila.consultar_proxima()
+        elif opcao == "0":
+            break
+        else:
+            print("\n")
+            print("Opção inválida!")
+
+def menu_recepcionista(fila):
+    codigo = input("Digite o código de acesso: ")
+    if codigo != "ADM1234":
+        print("\n")
+        print("Código de acesso inválido!")
+        return
+
+    while True:
+        print("\n--- Menu Recepcionista ---")
+        print("1 - Consultar próxima senha")
+        print("2 - Chamar próxima senha")
+        print("3 - Listar todas as senhas na fila")
+        print("0 - Voltar")
+
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == "1":
+            fila.consultar_proxima()
+        elif opcao == "2":
+            fila.chamar_proxima()
+        elif opcao == "3":
+            fila.listar_fila()
+        elif opcao == "0":
+            break
+        else:
+            print("\n")
+            print("Opção inválida!")
+
+def menu_principal():
+    fila = FilaAtendimentoComHeap()
+
+    while True:
+        print("\n==== Sistema de Atendimento ====")
+        print("1 - Paciente")
+        print("2 - Recepcionista")
+        print("0 - Sair")
+
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == "1":
+            menu_paciente(fila)
+        elif opcao == "2":
+            menu_recepcionista(fila)
+        elif opcao == "0":
+            
+            print("Encerrando o sistema...")
+            break
+        else:
+            print("\n")
+            print("Opção inválida!")
+
+if __name__ == "__main__":
+    menu_principal()
